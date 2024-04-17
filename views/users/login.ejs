@@ -1,0 +1,131 @@
+
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Page</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+.login-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 25%;
+}
+
+h1 {
+    text-align: center;
+}
+
+.form-control {
+    margin-bottom: 20px;
+}
+
+.form-control label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-control input[type="text"],
+.form-control input[type="password"],
+.form-control select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.registration-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.registration-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.registration-link a:hover {
+    text-decoration: underline;
+}
+
+</style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <form action="/login" method="POST" id="loginForm">
+            <div class="form-control">
+                <label for="userType">Login as:</label>
+                <select id="userType" name="userType" required onchange="updateFormAction(this)">
+                    <option value="regular">Regular</option>
+                    <option value="parent">Parent</option>
+                    <option value="kid">Kid</option>
+                    <option value="admin">Admin</option>
+                </select>
+                
+            </div>
+            <div class="form-control">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-control">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="registration-link">
+            Don't have an account? <a href="/register">Register here</a>.
+        </div>
+    </div>
+
+<script>
+    function updateFormAction(userType) {
+        var form = document.getElementById('loginForm');
+        switch(userType) {
+            case 'parent':
+                form.action = '/parent/login';
+                break;
+            case 'kid':
+                form.action = '/kid/login';
+                break;
+            case 'admin':
+                form.action = '/admin/login';
+                break;
+            default:
+                form.action = '/login'; // Default action for regular users
+                break;
+        }
+    }
+</script>
+
+</body>
+
+</html>

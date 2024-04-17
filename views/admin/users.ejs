@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User Management</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #007de4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #000000;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: #000000;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 6px 12px;
+            border: none;
+            background-color: #dc3545;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #c82333;
+        }
+
+        canvas {
+            margin-top: 20px;
+            border: 1px solid #000000;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Registration Graph</h1>
+    <canvas id="userGraph" width="200" height="20"></canvas>
+
+    <h1>User List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Correct Answers</th>
+                <th>Incorrect Answers</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(user => { %>
+            <tr>
+              <td><%= user.username %></td>
+              <td><%= user.isAdmin ? 'Admin' : 'User' %></td>
+              <td><%= user.correctAnswersCount || 0 %></td>
+              <td><%= user.incorrectAnswersCount || 0 %></td>
+              <td>
+                <form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST">
+                  <button type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+    </table>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const userDataForGraph = JSON.parse('<%- JSON.stringify(userDataForGraph) %>');
+
+        const ctx = document.getElementById('userGraph').getContext('2d');
+        const userChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: userDataForGraph.labels,
+            datasets: [{
+              label: 'User Registrations',
+              data: userDataForGraph.data,
+              fill: false,
+              borderColor: 'rgb(75, 192, 192)',
+              tension: 0.1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+    </script>
+</body>
+</html>

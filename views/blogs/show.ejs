@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= blog.title %></title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Ensure this path is correct for your styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> <!-- Font Awesome for icons -->
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Container for the blog post */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Blog title */
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        /* Blog image */
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Interaction Icons */
+        .interaction-icons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .interaction-icon {
+            cursor: pointer;
+            margin: 0 10px;
+            font-size: 24px;
+        }
+
+        .fa-heart {
+            color: #ff4757; /* Red heart icon */
+        }
+
+        /* Links styling */
+        a, .share-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover, .share-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Share Links */
+        .share-links {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .interaction-icon:hover + .share-links,
+        .share-links:hover {
+            display: block;
+        }
+        
+        /* Author styling */
+        .author {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        /* Content styling */
+        .content {
+            margin-bottom: 20px;
+        }
+        
+        /* Edit and Delete Buttons */
+        .edit-delete-buttons a,
+        .edit-delete-buttons form {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        button {
+            background-color: #ff5252;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #f40000;
+        }
+
+        .social-icons {
+    display: flex;
+    align-items: center;
+}
+
+.icon-container {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Space between icons */
+}
+
+.icon {
+    cursor: pointer;
+    margin-right: 8px; /* Space between icon and count */
+    transition: transform 0.2s; /* Smooth transition for zoom effect */
+}
+
+.icon:hover {
+    transform: scale(1.5); /* Zoom effect on hover */
+}
+body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .social-icons {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .icon-container {
+            cursor: pointer;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-right: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .heart {
+            color: red;
+        }
+
+        .icon:hover {
+            transform: scale(1.2);
+        }
+
+        .share-button {
+            position: relative;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .share-links {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .share-button:hover .share-links {
+            display: block;
+        }
+
+        .share-link {
+            display: block;
+            color: #007bff;
+            text-decoration: none;
+            margin: 5px 0;
+        }
+
+        .share-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+    <h1><%= blog.title %></h1>
+    <p class="author">Author: <%= blog.author %>, <%= new Date(blog.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %> · <%= readingTime %> min read</p>
+    <div class="social-icons">
+      <div class="icon-container">
+        <span class="icon heart" onclick="incrementCount('heartCount')">&#10084;</span>
+        <span id="heartCount">0</span>
+    </div>
+    <div class="icon-container">
+        <span class="icon clap" onclick="incrementCount('clapCount')">&#128079;</span>
+        <span id="clapCount">0</span>
+    </div>
+    <div class="share-button">Share
+        <div class="share-links">
+            <a href="#" class="share-link">LinkedIn</a>
+            <a href="#" class="share-link">Facebook</a>
+            <a href="#" class="share-link">TikTok</a>
+            <!-- Add more links here -->
+        </div>
+    </div>
+    </div>
+    <% if (blog.image) { %>
+        <img src="<%= blog.image.url %>" alt="<%= blog.title %> Image" style="max-width:100%; height:auto;">
+    <% } %>
+  
+<!-- show.ejs -->
+<div class="content blog-content">
+  <%- blog.content %>
+</div>
+
+    <!-- Interaction Icons and Edit/Delete buttons -->
+ 
+
+    <div class="edit-delete-buttons">
+        <a href="/blogs/<%= blog._id %>/edit">Edit</a>
+        <form action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
+            <button type="submit">Delete</button>
+        </form>
+    </div>
+
+    <div class="back-to-list">
+        <a href="/blogs">Back to All Posts</a>
+    </div>
+</div>
+
+    <script>
+ function incrementCount(id) {
+    const countElement = document.getElementById(id);
+    let currentCount = parseInt(countElement.innerText);
+    countElement.innerText = currentCount + 1;
+}
+
+
+    </script> <!-- Ensure this path is correct for your JavaScript -->
+</body>
+</html>

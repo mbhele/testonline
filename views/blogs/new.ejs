@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a New Blog Post</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- CKEditor CDN -->
+    <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
+</head>
+<body>
+    <h1>Create a New Blog Post</h1>
+    <form action="/blogs" method="POST" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Title" required>
+        <input type="text" name="author" placeholder="Author" required>
+        <!-- Replace this textarea with CKEditor -->
+        <textarea name="content" id="editor" placeholder="Content" required></textarea>
+        <input type="file" name="image" accept="image/*">
+        <button type="submit">Publish</button>
+    </form>
+
+    <script>
+        // Replace the <textarea id="editor"> with a CKEditor instance.
+        CKEDITOR.replace('editor');
+    </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            background-color: #007de4;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            color: black;
+        }
+        h1, h2 {
+            margin: 0.5em 0;
+        }
+        p, ul {
+            margin-top: 10px;
+            text-align: left;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007de4;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #005aad;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, <%= user.username %>!</h1>
+        
+        <!-- Insert the conditional logic here -->
+        <% if (typeof kids !== 'undefined' && kids.length > 0) { %>
+            <h2>Your Children:</h2>
+            <ul>
+                <% kids.forEach(function(kid) { %>
+                    <li style="text-align: center;"><strong>Name:</strong> <%= kid.name %>, <strong>Username:</strong> <%= kid.username %>
+                        <!-- You can add more details like login attempts if you've implemented that feature -->
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>You haven't registered any children yet.</p>
+        <% } %>
+        
+        <!-- Rest of your profile page content -->
+        <a href="/" class="button">Home</a>
+        <a href="/chatbot" class="button">Try our Chatbot</a>
+        <form action="/parent/add-child" method="GET" style="display: inline;">
+            <button type="submit" class="button">Register Child</button>
+        </form>
+        <a href="/logout" class="button">logout</a>
+    </div>
+</body>
+</html>
+</html>

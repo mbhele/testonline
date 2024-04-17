@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Blog Posts</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Link to your CSS file -->
+   <style>
+    .blog-image {
+    width: 100px; /* Control the size of the image */
+    height: 100px; /* Make it a square to turn it into a circle */
+    border-radius: 50%; /* This makes the image circular */
+    object-fit: cover; /* This makes sure the image covers the area without distorting */
+    display: block; /* Ensures the image is block level to allow margin auto */
+    margin: 10px auto; /* Centers the image and adds some space above and below */
+}
+
+/* Global Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5; /* Light grey background */
+    color: #333; /* Dark grey text */
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: #007bff; /* Bootstrap's default blue */
+    text-decoration: none; /* Removes underline from links */
+}
+
+a:hover {
+    text-decoration: underline; /* Adds underline on hover */
+}
+
+/* Container */
+.container {
+    max-width: 800px; /* Set max-width of the content */
+    margin: auto; /* Center the container */
+    padding: 20px;
+    background-color: #ffffff; /* White background */
+    border-radius: 5px; /* Slightly rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-top: 20px; /* Add some spacing at the top */
+}
+
+/* Navbar/Header */
+.navbar {
+    background-color: #007bff; /* Bootstrap's default blue */
+    padding: 10px 20px;
+    color: #ffffff;
+}
+
+.navbar a {
+    color: #ffffff;
+    margin-left: 20px;
+}
+
+/* Blog List */
+.blog-list {
+    list-style: none; /* Remove default list styling */
+    padding: 0;
+}
+
+.blog-preview {
+    border-bottom: 1px solid #e1e1e1; /* Light grey border */
+    padding-bottom: 20px; /* Spacing below each post */
+    margin-bottom: 20px; /* Spacing between posts */
+}
+
+.blog-preview:last-child {
+    border-bottom: none; /* Removes border from the last item */
+}
+
+.blog-preview h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+.blog-preview p {
+    color: #666; /* Lighter grey for the paragraph */
+}
+
+/* Buttons */
+button, .create-new {
+    background-color: #007bff; /* Bootstrap's default blue */
+    color: #ffffff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover, .create-new:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.create-new {
+    display: block;
+    width: max-content;
+    margin: 20px auto 30px; /* Center the button and add spacing */
+}
+.blog-preview {
+    text-align: center; /* Centers the text below the image */
+    border-bottom: 1px solid #e1e1e1;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+/* Image styling is already provided */
+
+   </style>
+
+</head>
+<body>
+    <div class="container">
+        <h1>All Blog Posts</h1>
+        <a href="/blogs/new" class="create-new">Create New Post</a>
+        <% if(blogs.length > 0) { %>
+            <ul class="blog-list">
+                <% blogs.forEach(function(blog) { %>
+                    <li class="blog-preview">
+                        <% if(blog.image && blog.image.url) { %>
+                            <img class="blog-image" src="<%= blog.image.url %>" alt="Blog Post Image">
+                        <% } %>
+                        <h2><a href="/blogs/<%= blog._id %>"><%= blog.title %></a></h2>
+                        <p>Written by <%= blog.author %></p>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } else { %>
+            <p>No blog posts to display.</p>
+        <% } %>
+    </div>
+
+    <script src="/js/script.js"></script> <!-- Make sure this path is correct -->
+</body>
+</html>

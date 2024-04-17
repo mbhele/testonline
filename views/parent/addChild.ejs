@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Child</title>
+ 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            position: relative;
+            width: 300px;
+        }
+        form {
+            position: relative;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            position: absolute;
+            top: 0;
+            left: 60%;
+            transform: translateX(-50%);
+            margin-top: -50px; /* Adjust based on the height of the h1 */
+            color: #333;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        button[type="submit"] {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Your Child</h1>
+        <form action="/parent/add-child" method="POST">
+            <input type="text" name="childName" placeholder="Child's Name" required>
+            <input type="number" name="age" placeholder="Child's Age" required>
+            <input type="text" name="grade" placeholder="Grade (Optional)">
+            <textarea name="message" placeholder="Add a nice message for your child (Optional)"></textarea>
+            <!-- Add fields for username and password -->
+            <input type="text" name="username" placeholder="Child's Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Add Child</button>
+        </form>
+    </div>
+</body>
+</html>

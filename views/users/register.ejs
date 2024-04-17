@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+ <style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.registration-form {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+fieldset.role-selection {
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+fieldset.role-selection legend {
+    padding: 0 5px;
+}
+
+fieldset.role-selection label {
+    display: block;
+    margin: 5px 0;
+}
+
+.secret-code {
+    display: none;
+}
+
+ </style>
+
+</head>
+<body>
+    <form action="/register" method="POST" class="registration-form">
+        <h1>Register</h1>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <fieldset class="role-selection">
+            <legend>User Role</legend>
+            <label>
+                <input type="radio" id="regular" name="role" value="regular" checked>
+                Regular User
+            </label>
+            <label>
+                <input type="radio" id="parent" name="role" value="parent">
+                Parent
+            </label>
+            <label>
+                <input type="radio" id="admin" name="role" value="admin">
+                Admin
+            </label>
+        </fieldset>
+
+        <div class="form-group secret-code" id="secretCodeContainer">
+            <label for="secretCode">Secret Code</label>
+            <input type="text" id="secretCode" name="secretCode">
+        </div>
+        
+        <button type="submit">Register</button>
+    </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('input[name="role"]').forEach(input => {
+        input.addEventListener('change', function() {
+            // Only show the secret code field if the admin role is selected
+            const isAdminRole = document.getElementById('admin').checked;
+            document.getElementById('secretCodeContainer').style.display = isAdminRole ? 'block' : 'none';
+        });
+    });
+});
+
+
+    </script> <!-- External JS file -->
+</body>
+</html>

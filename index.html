@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Equation Builder</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="problemArea">
+  <p id="question" class="question">Question will load here</p>
+  <!-- <p id="question">Question will load here</p> -->
+</div>
+
+<div id="searchArea">
+  
+  <input type="text" id="searchBox" placeholder="Type to search for elements..." oninput="searchElement()">
+  <div id="searchResults"></div>
+</div>
+<div id="go-back">
+<div id="equationArea">
+    <p>Build your equation here:</p>
+    <div id="equationSteps">
+      <div id="equationBuilder" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    </div>
+  </div>
+<!-- Add this within your HTML body where appropriate -->
+<button id="submitSolution">Submit Solution</button>
+<button id="backQuestion">Back</button>
+<button id="nextQuestion">Next Question</button>
+<button id="clearSolution">Clear Solution</button>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

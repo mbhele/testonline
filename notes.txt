@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Equation Builder</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="problemArea">
+  <p id="question">Question will load here</p>
+</div>
+
+<div id="searchArea">
+  <input type="text" id="searchBox" placeholder="Type to search for elements..." oninput="searchElement()">
+  <div id="searchResults"></div>
+</div>
+
+<div id="equationArea">
+    <p>Build your equation here:</p>
+    <div id="equationSteps">
+      <div id="equationBuilder" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    </div>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
+
+
+----------------------------------------------------------------
+
+#searchArea, #equationArea {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    width: 90%;
+  }
+  
+  #searchResults {
+    padding: 5px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    height: 100px; /* Adjust as needed */
+    overflow-y: auto;
+  }
+  
+  .draggable {
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #000;
+    background-color: #f1f1f1;
+    cursor: pointer;
+    display: inline-block;
+  }
+  
+  #equationBuilder {
+    min-height: 50px;
+    border: 1px dashed #aaa;
+  }
+  
+  .editable {
+    padding: 2px 5px;
+    margin: 0 2px;
+    display: inline-block;
+    border: 1px solid transparent; /* Hide border initially */
+  }
+  
+  .editable:focus {
+    border: 1px dashed #666; /* Show border when focused for editing */
+    outline: none; /* Remove default focus outline */
+  }
+
+
+
+  -------------------------------------------------------------------------------------
+  // Problem solutions structured in a way that we can check each step against the user input
+const problemSolutions = [
+    {
+      question: "Please solve this question x^2-2x-24=0",
+      solutions: {
+        step1: ["(x-6)(x+4)=0", "(x+4)(x-6)=0"], // Factored form of the equation
+        step2: ["x=6", "x=-4"] // Solutions of the equation
+      },
+      currentStep: 1,
+      marks: 3
+    }
+  ];
+  
+  // Define the element tools that can be searched and dragged onto the equation builder
+  const elementTools = {
+    bracket1: "(",
+    one: "1",
+    two: "2",
+    equal: "=",
+    plus:"+",
+    x1:"x",
+    x2:"x",
+    minus:"-",
+    zero:"0",
+    bracket2: ")",
+    xsquared:"x^2",
+    six:"6",
+    four:"4"
+  };
+  
+  function searchElement() {
+    const input = document.getElementById('searchBox').value.toLowerCase();
+    const results = document.getElementById('searchResults');
+    results.innerHTML = ''; // Clear previous results
+  
+    Object.entries(elementTools).forEach(([key, value]) => {
+      if (key.includes(input) || value.includes(input)) {
+        const element = document.createElement('div');
+        element.textContent = value;
+        element.classList.add('draggable');
+        element.setAttribute('draggable', true);
+        element.ondragstart = drag;
+        results.appendChild(element);
+      }
+    });
+  }
+  
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+  
+  function drag(event) {
+    event.dataTransfer.setData("text", event.target.textContent);
+  }
+  
+  function drop(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text");
+    const newElement = document.createElement('span');
+    newElement.textContent = data;
+    newElement.classList.add('editable');
+    newElement.setAttribute('contenteditable', true);
+    newElement.onclick = function() { this.focus(); };
+  
+    if (event.target.id === "equationBuilder" && event.target.hasChildNodes()) {
+      event.target.appendChild(document.createTextNode(' ')); // Add space before new element
+    }
+    
+    event.target.appendChild(newElement);
+    
+    checkSolution();
+  }
+  
+  function checkSolution() {
+    const currentSolution = document.getElementById('equationBuilder').textContent.replace(/\s+/g, '');
+    const currentProblem = problemSolutions[0];
+  
+    const stepKey = `step${currentProblem.currentStep}`;
+    const solutions = currentProblem.solutions[stepKey].map(solution => solution.replace(/\s+/g, ''));
+  
+    if (solutions.includes(currentSolution)) {
+      alert(`Step ${currentProblem.currentStep} is correct!`);
+      if (currentProblem.solutions[`step${currentProblem.currentStep + 1}`]) {
+        currentProblem.currentStep += 1;
+      } else {
+        alert("The problem is fully solved!");
+      }
+    } else {
+      console.log("The current step is not yet correct. Keep trying!");
+    }
+  }
+  
+  function loadQuestion() {
+    const questionElement = document.getElementById('question');
+    const currentProblem = problemSolutions[0];
+    questionElement.textContent = currentProblem.question;
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    loadQuestion();
+    searchElement();
+  });
+  
+
+
+
+
+  Solution 2
+
+  ------------------------------------------
+
+
+  // Problem solutions structured in a way that we can check each step against the user input
+const problemSolutions = [
+    {
+      question: "Please solve this question x^2-2x-24=0",
+      solutions: {
+        step1: ["(x-6)(x+4)=0", "(x+4)(x-6)=0"], // Factored form of the equation
+        step2: ["x=6", "x=-4"] // Solutions of the equation
+      },
+      currentStep: 1,
+      marks: 3
+    }
+  ];
+  
+  // Define the element tools that can be searched and dragged onto the equation builder
+  const elementTools = {
+    bracket1: "(",
+    one: "1",
+    two: "2",
+    equal: "=",
+    plus:"+",
+    x1:"x",
+    x2:"x",
+    minus:"-",
+    zero:"0",
+    bracket2: ")",
+    xsquared:"x^2",
+    six:"6",
+    four:"4"
+  };
+  
+  function searchElement() {
+    const input = document.getElementById('searchBox').value.toLowerCase();
+    const results = document.getElementById('searchResults');
+    results.innerHTML = ''; // Clear previous results
+  
+    Object.entries(elementTools).forEach(([key, value]) => {
+      if (key.includes(input) || value.includes(input)) {
+        const element = document.createElement('div');
+        element.textContent = value;
+        element.classList.add('draggable');
+        element.setAttribute('draggable', true);
+        element.ondragstart = drag;
+        results.appendChild(element);
+      }
+    });
+  }
+  
+  function allowDrop(event) {
+    event.preventDefault();
+  }
+  
+  function drag(event) {
+    event.dataTransfer.setData("text", event.target.textContent);
+  }
+  
+  function drop(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text");
+    const newElement = document.createElement('span');
+    newElement.textContent = data;
+    newElement.classList.add('editable');
+    newElement.setAttribute('contenteditable', true);
+    newElement.onclick = function() { this.focus(); };
+  
+    if (event.target.id === "equationBuilder" && event.target.hasChildNodes()) {
+      event.target.appendChild(document.createTextNode(' ')); // Add space before new element
+    }
+    
+    event.target.appendChild(newElement);
+    
+    checkSolution();
+  }
+  
+  function checkSolution() {
+    const currentSolution = document.getElementById('equationBuilder').textContent.replace(/\s+/g, '');
+    const currentProblem = problemSolutions[0];
+  
+    const stepKey = `step${currentProblem.currentStep}`;
+    const solutions = currentProblem.solutions[stepKey].map(solution => solution.replace(/\s+/g, ''));
+  
+    if (solutions.includes(currentSolution)) {
+      alert(`Step ${currentProblem.currentStep} is correct!`);
+      
+      // Move to the next step if there is one
+      if (currentProblem.solutions[`step${currentProblem.currentStep + 1}`]) {
+        currentProblem.currentStep += 1;
+        document.getElementById('equationBuilder').innerHTML = ''; // Clear the builder for the next step
+        alert(`Now proceed to step ${currentProblem.currentStep}. Place the next part of the solution.`);
+      } else {
+        alert("The problem is fully solved!");
+        // Here you could also trigger any additional completion logic
+      }
+    } else {
+      console.log("The current step is not yet correct. Keep trying!");
+    }
+  }
+  
+  function loadQuestion() {
+    const questionElement = document.getElementById('question');
+    const currentProblem = problemSolutions[0];
+    questionElement.textContent = currentProblem.question;
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    loadQuestion();
+    searchElement();
+  });
+  
+
+  -------html----------
+
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Equation Builder</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="problemArea">
+  <p id="question">Question will load here</p>
+</div>
+
+<div id="searchArea">
+  <input type="text" id="searchBox" placeholder="Type to search for elements..." oninput="searchElement()">
+  <div id="searchResults"></div>
+</div>
+
+<div id="equationArea">
+    <p>Build your equation here:</p>
+    <div id="equationSteps">
+      <div id="equationBuilder" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+    </div>
+  </div>
+<!-- Add this within your HTML body where appropriate -->
+<button id="submitSolution">Submit Solution</button>
+
+<script src="script.js"></script>
+</body>
+</html>
+
+styles
+----------------------
+
+css
+#searchArea, #equationArea {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    width: 90%;
+  }
+  
+  #searchResults {
+    padding: 5px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    height: 100px; /* Adjust as needed */
+    overflow-y: auto;
+  }
+  
+  .draggable {
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #000;
+    background-color: #f1f1f1;
+    cursor: pointer;
+    display: inline-block;
+  }
+  
+  #equationBuilder {
+    min-height: 50px;
+    border: 1px dashed #aaa;
+  }
+  
+  .editable {
+    padding: 2px 5px;
+    margin: 0 2px;
+    display: inline-block;
+    border: 1px solid transparent; /* Hide border initially */
+  }
+  
+  .editable:focus {
+    border: 1px dashed #666; /* Show border when focused for editing */
+    outline: none; /* Remove default focus outline */
+  }
+
+
+
+
+========================
+
+const problemSolutions = [
+  {
+    top:"quadratic",
+    year:2023,
+    question: "Solve this question x&sup2;-2x-24=0",
+    requireAllSolutions: true,
+    NumberOfStepsOFProblem: 2,
+    solutions: {
+      step1: ["(x-6)(x+4)=0", "(x+4)(x-6)=0"],
+      step2: ["x=6", "x=-4", "-4=x", "6=x"]
+    },
+    currentStep: 1,
+    foundSolutions: []
+  }, {
+     top:"equation",
+    year:2022,
+    question: "Please solve this question x-3=0",
+    requireAllSolutions: true,
+    NumberOfStepsOFProblem: 1,
+    solutions: {
+      step1: ["x=3", "3=x"]
+    },
+    currentStep: 1,
+    foundSolutions: []
+  },{
+     top:"equation",
+    year:2021,
+    question: "Please solve this question x-6=0",
+    requireAllSolutions: true,
+    solutions: {
+      step1: ["x=6", "6=x"]
+    },
+    currentStep: 1,
+    foundSolutions: []
+  },
+  {
+      top:"quadratic",
+    year:2020,
+    question: "Solve this question x&sup2;+4x+4=0",
+    requireAllSolutions: true,
+    NumberOfStepsOFProblem: 2,
+    solutions: {
+      step1: ["(x+2)(x+2)=0"],
+      step2: ["x=-2","-2=x"]
+    },
+    currentStep: 1,
+    foundSolutions: []
+  },
+  {
+      top:"quadratic",
+    year:2021,
+    question: "Solve this question x&sup2;+4x=0",
+    requireAllSolutions: true,
+    NumberOfStepsOFProblem: 2,
+    solutions: {
+      step1: ["x(x+4)=0"],
+      step2: ["x=0","x=-4","-4=x"]
+    },
+    currentStep: 1,
+    foundSolutions: []
+  },
+  
+  {
+      top:"simultaneous equation",
+    year:2021,
+    question: "Solve simultaneously for x and y:<br> y + x =12 and xy = 14 -3x",
+    requireAllSolutions: true,
+    NumberOfStepsOFProblem: 2,
+    solutions: {
+      step1: ["x=14", "x=1", "y=-2", "y=11"],
+      
+    },
+    currentStep: 1,
+    foundSolutions: []
+  }
+  // ... other problems
+];
+// const probl

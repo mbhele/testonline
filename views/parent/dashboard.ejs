@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parent Dashboard</title>
+</head>
+<body>
+    <h1>Parent Dashboard</h1>
+    <% if (parent.children.length > 0) { %>
+        <ul>
+            <% parent.children.forEach(child => { %>
+                <li><%= child.username %> - <a href="/child/progress/<%= child._id %>">View Progress</a></li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <p>No children linked to this account.</p>
+    <% } %>
+</body>
+</html>

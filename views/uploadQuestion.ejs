@@ -1,0 +1,14 @@
+<!-- uploadQuestion.ejs -->
+
+<html>
+<head>
+    <title>Upload Questions</title>
+</head>
+<body>
+    <h1>Upload Questions</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="questionsFile" accept=".json">
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>

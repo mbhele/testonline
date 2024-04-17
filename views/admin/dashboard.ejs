@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/dashboard.css"> <!-- Make sure to create a CSS file for styling -->
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin/manage-users">Manage Users</a></li>
+                <li><a href="/admin/manage-content">Manage Content</a></li>
+                <li><a href="/admin/reports">View Reports</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Welcome, <%= user.username %>!</h2>
+            <p>This is your admin dashboard, where you can manage users, content, and view reports.</p>
+        </section>
+
+        <!-- You can add more sections here depending on what you need to show on the dashboard -->
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Your Website</p>
+    </footer>
+</body>
+</html>

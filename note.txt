@@ -1,0 +1,31 @@
+// app.get('/fakeUser', async(req, res)=>{
+//   const user = new User({email:"mbusiseni.mbhele@gmail.com", username:"mbuso"})
+//  const newUser = await User.register(user, 'chicken');
+//  res.send(newUser);
+
+// })
+
+
+
+
+// app.get('/train',isLoggedIn,async (req, res) => {
+
+
+//   try {
+//     const elementTools = await ElementToolModel.find().select('-_id -__v');
+//     res.render('index', {
+//       problemSolutions: problemSolutions,
+//       elementTools: JSON.stringify(elementTools)
+//     });
+//   } catch (error) {
+//     console.error('Failed to fetch data', error);
+//     res.status(500).send('An error occurred while fetching data.');
+//   }
+// });
+
+// Add additional routes as needed
+
+// Uncomment if you need a standalone server start point (e.g., when not using MongoDB connection success to start the server)
+// app.listen(9000, () => {
+//   console.log("Server started on port 9000");
+// });
