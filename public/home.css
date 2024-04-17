@@ -506,6 +506,15 @@ justify-content: space-around;
 }
 
 @media screen and (max-width: 600px) {
+    .icon {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        right: 8%;
+     
+       
+            color: white;
+    }
    
 .cards-container {
 flex-direction: column;
@@ -583,6 +592,13 @@ left: -2rem;
 @media (max-width: 480px) {
 .features-container {
 flex-direction: column;
+}
+#logo img {
+width: 120px;
+height: auto;
+position: absolute;
+top: -2rem;
+left: 0;
 }
 
 .feature-card {
