@@ -10,8 +10,8 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 require('dotenv').config();
 // const session = require('express-session');
-const MongoStore = require('connect-mongo');  // Require the MongoStore
-
+const { MongoClient } = require('mongodb');
+const MongoStore = require('connect-mongo');
 
 // Model imports
 const User = require('./models/user');
@@ -50,19 +50,25 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 // const isProduction = process.env.NODE_ENV === "production";
 
-const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI // Ensure your MONGO_URI is correctly set in your environment variables
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+const clientPromise = MongoClient.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({
+      clientPromise: clientPromise,
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
 app.use(sessionMiddleware);
 
 
