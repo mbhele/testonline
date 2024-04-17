@@ -3,6 +3,7 @@ const http = require('http');
 const path = require('path');
 const cors = require('cors');
 const session = require('express-session');
+// const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
@@ -50,18 +51,14 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 // const isProduction = process.env.NODE_ENV === "production";
 
-const sessionMiddleware = session({
-  secret: process.env.SESSION_SECRET,
+app.use(session({
+  secret: 'your_secret_key',
   resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI // Ensure your MONGO_URI is correctly set in your environment variables
-  }),
-  cookie: {
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-});
+  saveUninitialized: false,
+  store: MongoStore.create({ 
+      mongoUrl: process.env.MONGO_URI 
+  })
+}));
 
 app.use(sessionMiddleware);
 
