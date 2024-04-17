@@ -54,12 +54,12 @@ const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({  // Use the create method to setup MongoStore
-      mongoUrl: process.env.MONGO_URI  // Ensure your MONGO_URI is correctly set in your environment variables
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI // Ensure your MONGO_URI is correctly set in your environment variables
   }),
   cookie: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 });
 
