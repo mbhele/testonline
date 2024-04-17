@@ -7,7 +7,7 @@ const { storage } = require('../config/cloudinary');
 // Correct import if middleware.js is at the same level as the routes directory
 const { isAdmin } = require('../middleware');
 const { isLoggedIn } = require('../middleware'); // For checking login status
-const Blog = require('../models/Blog'); // Ensure this is the correct path to your Blog model
+const Blog = require('../models/blog'); // Ensure this is the correct path to your Blog model
 
 // OR if your structure has routes and middleware at the same directory level
 // and you're inside one of the route files.
