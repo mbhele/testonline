@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
-const session = require('express-session');
+// const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 require('dotenv').config();
 // const session = require('express-session');
+const session = require('express-session');
 const { MongoClient } = require('mongodb');
 const MongoStore = require('connect-mongo');
 
@@ -55,22 +56,22 @@ const clientPromise = MongoClient.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true,
 });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    store: MongoStore.create({
-      clientPromise: clientPromise,
-    }),
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  })
-);
-app.use(sessionMiddleware);
+// Define session middleware
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  store: MongoStore.create({
+    clientPromise: clientPromise,
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+});
 
+// Use session middleware
+app.use(sessionMiddleware);
 
 app.use(flash());
 app.use(passport.initialize());
