@@ -188,8 +188,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('Client disconnected'));
 });
 
-const port = process.env.port || 3000;
-
+const port = process.env.PORT || 9000;
 server.listen(port, () => {
-  console.log('Server with Socket.IO is running on port 9000');
+  console.log(`Server with Socket.IO is running on port ${port}`);
 });
