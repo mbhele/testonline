@@ -1,44 +1,48 @@
+const bcrypt = require('bcryptjs');
 const express = require('express');
 const passport = require('passport');
-const User = require('../models/user');
-const Kid = require('../models/kid'); // Ensure the path matches your project structure
-
+const User = require('../models/user'); // Ensure the import path is correct
+const ParentAnswer = require('../models/parent')
 const router = express.Router();
 const { isLoggedIn, isAdmin, checkRole } = require('../middleware');
-// Registration Route
+// users.js
+
+// Import the calculateScore function from the scoreCalculator.js file
+const calculateScore = require('../public/scoreCalculator');
+
+// Now you can use the calculateScore function in this file
+
+
 router.get('/register', (req, res) => {
-    res.render('users/register'); // Make sure you have a view template for registration
+    res.render('users/register');
 });
 
-router.post('/register', async (req, res, next) => { // 'next' is added to handle errors in req.login
-    console.log(req.body); // Debugging purpose
+router.post('/register', async (req, res) => {
     const { username, email, password, role, secretCode } = req.body;
 
-    // First, validate the role and secret code if needed
-    if (!checkRole(role, secretCode)) {
-        req.flash('error', 'Invalid role selection or secret code.');
+    // Assuming here that only 'parent' and 'admin' roles are allowed
+    if (role !== 'parent' && role !== 'admin') {
+        req.flash('error', 'Invalid role selection.');
         return res.redirect('/register');
     }
 
     try {
-        // Assuming you have a User model set up to handle registration logic,
-        // including password hashing. Adjust according to your setup.
-        const newUser = new User({ username, email, role });
-
-        // Replace this with your user registration logic if different.
-        // This example assumes you have a method to handle registration and hashing.
-        await User.register(newUser, password);
-
-        // Automatically log in the user after registration
-        req.login(newUser, (err) => {
-            if (err) return next(err); // Properly handle the error
-
-            // Redirect based on the user's role
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({
+            username,
+            email,
+            hash: hashedPassword,
+            role
+        });
+        await newUser.save();
+        req.login(newUser, err => {
+            if (err) {
+                console.error(err);
+                return res.redirect('/login');
+            }
             switch (newUser.role) {
                 case 'parent':
                     return res.redirect('/profile');
-                case 'kid':
-                    return res.redirect('/kid/profile');
                 case 'admin':
                     return res.redirect('/admin/dashboard');
                 default:
@@ -46,11 +50,12 @@ router.post('/register', async (req, res, next) => { // 'next' is added to handl
             }
         });
     } catch (e) {
-        console.error(e); // Error logging
+        console.error(e);
         req.flash('error', e.message);
         return res.redirect('/register');
     }
 });
+
 // Login Routes
 router.get('/login', (req, res) => {
     res.render('users/login');
@@ -60,71 +65,79 @@ router.post('/login', passport.authenticate('local', {
     failureRedirect: '/login',
     failureFlash: true
 }), (req, res) => {
-    // Redirect based on the user's role
-    switch(req.user.role) {
+    switch (req.user.role) {
         case 'parent':
-            return res.redirect('/profile'); // Parent's profile page
-        case 'kid':
-            return res.redirect('/kid/profile'); // Kid's profile page
+            return res.redirect('/profile');
         case 'admin':
-            return res.redirect('/admin/dashboard'); // Admin dashboard
-        case 'regular':
+            return res.redirect('/admin/dashboard');
         default:
-            return res.redirect('/'); // Homepage or regular user's dashboard if exists
+            return res.redirect('/'); // Default route if role is not recognized
     }
 });
 
-// Parent Profile Route
 router.get('/profile', isLoggedIn, async (req, res) => {
-    // Ensure user is a parent
     if (req.user.role !== 'parent') {
+        req.flash('error', 'Only parents can access this page.');
         return res.redirect('/');
     }
     try {
-        const kids = await Kid.find({ parent: req.user._id }).lean();
-        res.render('users/profile', { user: req.user, kids });
+        // Fetch user's answers from the database
+        const userAnswers = await ParentAnswer.find({ parent: req.user._id });
+
+        // Calculate the score
+        const score = calculateScore(userAnswers);
+
+        // Calculate the percentage
+        const totalQuestions = userAnswers.length; // Assuming each answer represents one question
+        const percentage = (score / totalQuestions) * 100;
+
+        // Render the profile template with fetched data, score, and percentage
+        res.render('users/profile', {
+            user: req.user,
+            userAnswers: userAnswers,
+            score: score,
+            percentage: percentage // Add the percentage variable to the template data
+        });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error accessing the parent profile:', error);
+        req.flash('error', 'An error occurred while trying to access the profile.');
         res.redirect('/');
     }
 });
 
 
-// Kid login routes
-router.get('/kid/login', (req, res) => {
-    // Check if there's a flash message for errors (incorrect username/password)
-    const message = req.flash('error');
-    
-    // Render the login form with any flash messages
-    res.render('kidLogin', { message }); // Assuming your EJS file is named kidLogin.ejs
-});
 
-router.post('/kid/login', async (req, res) => {
-    const { username, password } = req.body;
+
+
+
+
+router.post('/api/submit-answer', async (req, res) => {
+    const { answer } = req.body;
+    console.log('Received answer from client:', req.body);
 
     try {
-        const kid = await Kid.findOne({ username }).exec();
-        if (!kid) {
-            req.flash('error', 'Username not found.');
-            return res.redirect('/kid/login');
+        // Placeholder validation
+        if (!answer || typeof answer !== 'string') {
+            return res.status(400).json({ success: false, message: 'Invalid answer format' });
         }
 
-        if (!(await kid.validatePassword(password))) {
-            req.flash('error', 'Incorrect password.');
-            return res.redirect('/kid/login');
-        }
-
-        req.logIn(kid, (err) => {
-            if (err) {
-                req.flash('error', 'Error logging in');
-                return res.redirect('/kid/login');
-            }
-            return res.redirect('/kid/profile');
+        // Create a new instance of the Answer model
+        const newAnswer = new ParentAnswer({
+            parent: req.user._id, // Assign the parent's _id to the parent field
+            selectedAnswer: answer, // Use selectedAnswer instead of answer
+            createdAt: new Date(), // Example: Include creation timestamp
+            updatedAt: new Date() // Example: Include update timestamp
         });
+
+        // Save the new answer document to the database
+        await newAnswer.save();
+
+        // Respond with a success message
+        res.json({ success: true, message: 'Answer submitted successfully' });
     } catch (error) {
-        console.error('Login error:', error);
-        req.flash('error', 'An error occurred.');
-        res.redirect('/kid/login');
+        console.error('Error submitting answer:', error);
+        // Handle database or other errors
+        res.status(500).json({ success: false, message: 'An error occurred while submitting the answer' });
     }
 });
 
@@ -132,42 +145,17 @@ router.post('/kid/login', async (req, res) => {
 
 
 
-// Route for rendering the kid's profile page
-router.get('/kid/profile', isLoggedIn, async (req, res) => {
-    if (!req.session.kidId) {
-      req.flash('error', 'Not authorized.');
-      return res.redirect('/login');
-    }
-    
-    try {
-      const kid = await Kid.findById(req.session.kidId);
-      if (!kid) {
-        req.flash('error', 'Profile not found.');
-        return res.redirect('/kid/login');
-      }
-      res.render('kid/profile', { kid });
-    } catch (error) {
-      console.error('Fetching kid profile failed:', error);
-      req.flash('error', 'An error occurred while fetching the profile.');
-      res.redirect('/kid/login');
-    }
-  });
-  
 
 router.get('/admin/dashboard', isLoggedIn, (req, res) => {
-    // Ensure user is an admin
     if (req.user.role !== 'admin') {
         req.flash('error', 'You do not have permission to view this page.');
         return res.redirect('/');
     }
-    // Pass the logged-in user to the dashboard template
     res.render('admin/dashboard', { user: req.user });
 });
 
-
-// Logout Route
-router.get('/logout', (req, res, next) => {
-    req.logout(function(err) {
+router.get('/logout', (req, res) => {
+    req.logout(err => {
         if (err) { return next(err); }
         res.redirect('/');
     });

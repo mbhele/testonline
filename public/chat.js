@@ -2,9 +2,11 @@ let currentQuestionIndex = 0;
 let selectedTopic = ''; // Keeps track of the selected topic
 let isAwaitingInput = false; // Manages when to expect input
 let currentSetIndex = 1; // Manages the current set of questions
+let correctAnswers = 0; // Tracks the number of correct answers
+let totalAttempts = 0; // Tracks the total number of attempted questions
 
 const questionsSet1 = [
-    { image: "Candles in Box.png", q1: "How many candles are there?", solution: 5, possibleanswers: [3, 6, "I am not sure", 5] },
+    { image: "Candles in Box .png", q1: "How many candles are there?", solution: 5, possibleanswers: [3, 6, "I am not sure", 5] },
     { image: "Candles on rack.png", q2: "How many boxes on a rack?", solution: 7, possibleanswers: [8, 4, 6, "I am not sure", 7] },
     { image: "Candles on rack.png", q3: "How many candles on a rack?", solution: 50, possibleanswers: [30, 50, 10, "I am not sure", 10] },
 ];
@@ -56,11 +58,14 @@ let currentQuestions = questionsSet1; // Start with the first set of questions
         dropzone.addEventListener('drop', (e) => {
             e.preventDefault();
             const answer = e.dataTransfer.getData('text/plain');
+            console.log('Selected answer:', answer); // Log the selected answer to the console
             if (parseInt(answer) === question.solution) {
                 dropzone.style.backgroundColor = '#4CAF50'; // Correct answer
                 dropzone.textContent = 'Correct! Loading next question...';
                 setTimeout(() => {
-                    displayQuestion(modalContent);
+                    // Send the user's answer to the backend
+                    sendAnswerToBackend(answer);
+                    displayQuestion();
                 }, 1000);
             } else {
                 dropzone.style.backgroundColor = '#f44336'; // Incorrect answer
@@ -71,24 +76,72 @@ let currentQuestions = questionsSet1; // Start with the first set of questions
                 }, 2000);
             }
         });
+        
+    // Define the answerIsValid function
+function answerIsValid(answer) {
+    // Add your validation logic here
+    return answer !== null && answer !== undefined;
+}
 
-        return questionDiv;
+function sendAnswerToBackend(answer) {
+    // Send the user's answer to the backend using fetch or another method
+    fetch('/api/submit-answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ answer }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to submit answer');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Handle successful submission if needed
+        console.log('Answer submitted successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error submitting answer:', error);
+        // Handle error appropriately (e.g., display an error message to the user)
+    });
+}
+
+return questionDiv;
     }
 
-    function displayQuestion(modalContent) {
+    function displayQuestion() {
         if (currentQuestionIndex < currentQuestions.length) {
-            const question = currentQuestions[currentQuestionIndex++];
+            const modalContent = document.getElementById('modalContent');
             modalContent.innerHTML = ''; // Clear previous content
+            const question = currentQuestions[currentQuestionIndex++];
             modalContent.appendChild(createQuestionElement(question, modalContent));
-        } else if (currentSetIndex === 1) {
-            // If the first set is completed, redirect to the profile page
-            window.location.href = 'http://localhost:9000/kid/profile';
+            isAwaitingInput = true; // Set to expect input for the new question
         } else {
-            // Handle completion after the second set
-            modalContent.innerHTML = '<p>All questions completed!</p>';
-            setTimeout(() => {
-                window.location.href = 'http://localhost:9000/kid/profile'; // Optional: Redirect again if needed
-            }, 2000);
+            // Check if all questions in the set are completed
+            if (currentSetIndex === 1) {
+                // Display a message indicating the end of the first set
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = '<p>End of Set 1. Would you like to continue with Set 2?</p>';
+                const continueButton = document.createElement('button');
+                continueButton.textContent = "Continue to Set 2";
+                continueButton.onclick = () => {
+                    currentSetIndex++; // Move to the next set
+                    currentQuestionIndex = 0; // Reset question index for the new set
+                    currentQuestions = questionsSet2; // Switch to the second set of questions
+                    displayQuestion(); // Display the first question of the second set
+                };
+                modalContent.appendChild(continueButton);
+            } else {
+                // Display a message indicating the completion of both sets
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = '<p>All questions completed!</p>';
+                // Optionally, you can redirect to the profile page after a delay
+                setTimeout(() => {
+                    window.location.href = 'http://localhost:9002/profile';
+                }, 5000);
+            }
         }
     }
     
@@ -145,6 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleUserInput() {
         const userInput = document.getElementById('userInput').value.trim();
+
         if (userInput === '') {
             alert('Please enter something in the input field.');
             document.getElementById('userInput').style.borderColor = 'red';
@@ -154,6 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
             displayUserMessage(userInput);
             document.getElementById('userInput').value = ''; // Clear input field immediately after use
         }
+    
+        totalAttempts++; // Increment total attempts
+    
         // Simulate a delay before showing the bot message (replace with your actual logic)
         setTimeout(function() {
             displayBotMessage(`🎉👋 Welcome to our Math Adventure, ${userInput}! 🚀✨ I'm super excited to explore the magical world of numbers with you! Let's dive in and have some fun with math! 🧮🌈`);
@@ -193,27 +250,35 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset the awaiting input flag as we've processed the input
             isAwaitingInput = false;
         }, 8000);
-    }
+        
+
     
+    
+        // Simulate a delay before moving to the next question
+        setTimeout(() => {
+            displayQuestion(); // Move to the next question
+        }, 3000);
+    }
 
     function displayBotMessage(message, button) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message chatbot-message';
         messageDiv.textContent = message;
-        
+    
+        // Check if a button is provided and render it
         if (button) {
             const buttonElement = document.createElement('button');
             buttonElement.textContent = button;
             buttonElement.className = 'chatbot-button';
-            buttonElement.onclick = () => openVideoModal();
+            buttonElement.onclick = function() {
+                handleButtonClicked(button);
+            };
             messageDiv.appendChild(buttonElement);
         }
-
+    
         chatBox.appendChild(messageDiv);
-        scrollToBottom();
-        scrollToBottom();
+        scrollToBottom(); // Ensure the new message is in view
     }
-
     function displayBotMessageWithDynamicContent(text) {
         let message = text;
         if (message.includes('${topic}')) {
@@ -293,7 +358,6 @@ function displayBotMessage(message, button) {
         chatBox.appendChild(messageDiv);
         scrollToBottom(); // Ensure the new message is in view
     }
-
     // Present images for the second question
     function presentImages() {
         const images = ['images/U (5).png', 'images/U (7).png', 'images/U (8).png', 'images/U (9).png']; // Update with your image paths
@@ -545,6 +609,10 @@ function openVideoModal() {
     video.style.transition = 'opacity 2s'; // Set fade-out transition
 }
 
+function displayResult() {
+    console.log(`You got ${correctAnswers}/${totalAttempts} correct.`);
+    
+}
 
     
 
@@ -558,6 +626,8 @@ function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
     
 }
+
+displayResult();
 
    // Event listener for the close button in the video modal
 });

@@ -2,42 +2,37 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const cors = require('cors');
-// const session = require('express-session');
+const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
-require('dotenv').config();
-// const session = require('express-session');
-const session = require('express-session');
-const { MongoClient } = require('mongodb');
 const MongoStore = require('connect-mongo');
+require('dotenv').config();
 
 // Model imports
 const User = require('./models/user');
+const Kid = require('./models/Kid'); // Assuming Kid model is correctly set up like User
 
 // Route imports
 const userRoutes = require('./routes/users');
-const trainRoutes = require('./routes/train');
+// const trainRoutes = require('./routes/train');
 const chatbotRoutes = require('./routes/chatbot');
 const aboutRoutes = require('./routes/about');
 const blogRoutes = require('./routes/blogRoutes');
-const parentRoutes = require('./routes/parent');
-const childRoutes = require('./routes/kidRoutes');
-const adminRoutes = require('./routes/adminRoutes'); // Update the path as necessary
+
+// const childRoutes = require('./routes/kidRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const fileUploadRouter = require('./routes/fileUpload');
 
 const app = express();
 
-// Passport Config
-require('./passportConfig')(passport);
-require('./config/passportKid')(passport);
+// Passport Config - assuming passportConfig is correctly set up
+require('./config/passportKid')(passport); // Adjust the path as necessary
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+// MongoDB Connection Setup
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
@@ -46,134 +41,94 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-// const isProduction = process.env.NODE_ENV === "production";
 
-const clientPromise = MongoClient.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// Define session middleware
 const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // Changed to false for better security (prevents session fixation)
   store: MongoStore.create({
-    clientPromise: clientPromise,
+    mongoUrl: process.env.MONGO_URI
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  },
+    secure: process.env.NODE_ENV === 'production', // Set to true only if on HTTPS
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
 });
 
-// Use session middleware
 app.use(sessionMiddleware);
-
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Passport Local Strategy
+passport.use(new LocalStrategy({
+    usernameField: 'username', // ensure your form has a username field
+    passwordField: 'password'  // ensure your form has a password field
+  }, async (username, password, done) => {
+    try {
+      let user = await User.findOne({ username });
+      if (!user) {
+        user = await Kid.findOne({ username });
+      }
 
+      if (!user) {
+        return done(null, false, { message: 'User not found' });
+      }
 
-// New Unified Local Strategy for User and Kid
-passport.use(new LocalStrategy(async (username, password, done) => {
-  let user = await User.findOne({ username });
-  if (!user) user = await Kid.findOne({ username });
+      const isValid = await user.validatePassword(password);
+      if (!isValid) {
+        return done(null, false, { message: 'Incorrect password' });
+      }
 
-  if (!user) {
-      return done(null, false, { message: 'User not found' });
-  }
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  }));
 
-  const isValid = await user.validatePassword(password);
-  if (!isValid) {
-      return done(null, false, { message: 'Incorrect password' });
-  }
-
-  return done(null, user);
-}));
-
+// Serialization and Deserialization
 passport.serializeUser((user, done) => {
   done(null, { id: user.id, type: user instanceof Kid ? 'Kid' : 'User' });
 });
 
 passport.deserializeUser(async (userKey, done) => {
   const Model = userKey.type === 'Kid' ? Kid : User;
-  const user = await Model.findById(userKey.id);
-  done(null, user);
-});
-
-
-
-passport.serializeUser((user, done) => {
-  done(null, { id: user.id, type: user instanceof Kid ? 'Kid' : 'User' });
-});
-
-passport.deserializeUser((userKey, done) => {
-  const Model = userKey.type === 'Kid' ? Kid : User;
-  Model.findById(userKey.id, (err, user) => {
-      done(err, user);
-  });
-});
-
-
-
-app.use(methodOverride('_method'));
-
-app.use(passport.session());
-app.use((req, res, next) => {
-  console.log('---sesifikile--')
-  console.log('Session:', req.session);
-  console.log('User:', req.user);
-  console.log('Authenticated:', req.isAuthenticated());
-    res.locals.isAuthenticated = req.isAuthenticated();
-    next();
+  try {
+    const user = await Model.findById(userKey.id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
 });
 
 // Routes
 app.use('/', userRoutes);
-app.use('/trains', trainRoutes);
 app.use('/about', aboutRoutes);
 app.use('/chatbot', chatbotRoutes);
-app.use('/parent', parentRoutes);
+
 app.use('/blogs', blogRoutes);
-app.use('/child', childRoutes);
+
 app.use('/admin', adminRoutes);
 app.use('/upload', fileUploadRouter);
 
-
-app.get('/chatbot', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        req.flash('error', 'You must be logged in to access this page.');
-        return res.redirect('/login'); // Redirect to login if not authenticated
-    }
-    try {
-        const user = await User.findById(req.user._id);
-        user.visitCount += 1;
-        await user.save();
-        res.render('chatbot', {
-            user: user,
-            questions: JSON.stringify(questions),
-            visitCount: user.visitCount,
-            isAuthenticated: true,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("An error occurred");
-    }
-});
 // Root Route
 app.get('/', (req, res) => {
-  res.render('home');
+  res.render('home', { user: req.user || null });
 });
 
+
+
 // Error handling
+// After all specific routes
 app.use((req, res, next) => {
-  res.status(404).send('Sorry, that route does not exist');
+  res.locals.user = req.user || null; // This makes user available as a local variable in all views
+  next();
 });
+
 
 const server = http.createServer(app);
 const io = require('socket.io')(server);
@@ -188,7 +143,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('Client disconnected'));
 });
 
-const port = process.env.PORT || 9000;
-server.listen(port, () => {
-  console.log(`Server with Socket.IO is running on port ${port}`);
+server.listen(process.env.PORT || 9002, () => {
+  console.log(`Server with Socket.IO is running on port ${process.env.PORT || 9000}`);
 });

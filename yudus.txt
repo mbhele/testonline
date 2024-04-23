@@ -1,464 +1,101 @@
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-#myBtn {
-  padding: 10px 20px;
-  background-color: #374eff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.7rem;
-  margin-top: 1px;
-}
-
--------------------------
-console.log("WE WONT GIVE UP!!!!!");
-// SELECT YEAR 
-let selectedYear = document.getElementById("year-select").value;
-  var startYear = 2009;
-  var endYear = 2023;
-var select = document.getElementById("topic-select");
-var selectMonths = document.getElementById("months-select");
-// var select = document.getElementById("months-select");
-   var months = ["--select--", "March", "June", "September", "November", "Supplementary"];
-
-
-let currentProblemIndex = 0; // Starts with the first problem
-let correctAnswersCount = 0;
-let incorrectAnswersCount = 0;
-// const filter = document.querySelectorById("filter");
-let filter = document.querySelector("#filter");
-  // Get the modal
-  var modal = document.getElementById('myModal');
-
-  // Get the button that opens the modal
-  var btn = document.getElementById('myBtn');
-  
-  // Get the <span> element that closes the modal
-  var span = document.getElementsByClassName('close')[0];
-  
-
-const deleteQuestion = document.querySelector("#delete");
-// Preload sounds
-const dragSound = new Audio("sound/drag.mp3");
-const dropSound = new Audio("sound/drop.mp3");
-  
-filter.addEventListener('click', reloadPage)
-function getCurrentProblem() {
-  return problemSolutions[currentProblemIndex];
-}
-
-// console.log("Fried",problemSolutions[0])
-// console.log("GET  getCurrentProblem()",getCurrentProblem())
-
-
-// --------------------------
-// SELECT TOPIC
-var options = [ 
-  { value: "Solve for x", text: "Question 1 - Solve for x" },
-  { value: "Solve simultaneous equation", text: "Question 2 - Solve simultaneous equation" },
-  { value: "Geometric and arithmetic series", text: "Question 3 - Geometric and arithmetic series" },
-  { value: "Quadratic sequence", text: "Question 4 - Quadratic sequence" },
-  { value: "Functions", text: "Question 5 - Functions" },
-  { value: "Financial", text: "Question 6 - Financial" },
-  { value: "Derivatives", text: "Question 8 - Derivatives" },
-  { value: "Cubic functions graphs", text: "Question 9 - Cubic functions graphs" },
-  { value: "Optimization", text: "Question 10 - Optimization" },
-  { value: "Probability", text: "Question 11 - Probability" }
-];
-
-// Loop through the options and add them to the select element
-options.forEach(function (optionData) {
-  var option = document.createElement("option");
-  option.value = optionData.value;
-  option.textContent = optionData.text;
-  select.appendChild(option);
-});
-
-
-// SELECT YEAR 
-var select = document.getElementById("year-select");
-  var startYear = 2009;
-  var endYear = 2023;
-
-  // Loop through the years and add them to the select element
-  for (var year = endYear; year >= startYear; year--) {
-    var option = document.createElement("option");
-    option.value = year;
-    option.textContent = year;
-    select.appendChild(option);
-  }
-
-//  Loop through the months and add them to the select element
- for (var i = 0; i < months.length; i++) {
-  var option = document.createElement("option");
-  option.value = months[i];
-  option.textContent = months[i];
-  selectMonths.appendChild(option);
-}
-// ----------------------
-
-
-
-
-
-
-
-//SEARCH FUNCTION
-// document.getElementById('filterMe').addEventListener('click', filterQuestions);
-
-// function filterQuestions(){
-//   alert(1)
-// }
-// Add an event listener to the "Search" button
-document.getElementById('filterMe').addEventListener('click', filterQuestions);
-
-// Function to filter and display questions
-function filterQuestions() {
-  let selectedYear = Number(document.getElementById("year-select").value.toLowerCase());
-  let selectedMonth = document.getElementById("months-select").value.toLowerCase();
-  let selectedTopic = document.getElementById("topic-select").value.toLowerCase();
- 
-  // console.log("mom", getCurrentProblem())
-  console.log("Selected Year:", selectedYear);
-  console.log("Selected Month:", selectedMonth);
-  console.log("Selected Topic:", selectedTopic);
-
-  // Clear the current question display
-  document.getElementById('question').innerHTML = '';
-
-  // Filter questions based on user selections
- 
-
-  let filteredQuestions = problemSolutions.filter((problem) => {
-    
-    // console.log("Problem", problem);
-    return (
-      (selectedYear === "" || problem.year === selectedYear) &&
-      (selectedMonth === "" || problem.month.toLowerCase() === selectedMonth) &&
-      (selectedTopic === "" || problem.topic.toLowerCase() === selectedTopic)
-    );
-  });
-
-
-  // Log the filtered questions for debugging
-  // console.log("Filtered Questions:", filteredQuestions);
- 
-  // Display the first filtered question, if any
-  if (filteredQuestions.length > 0) {
-       // Reset the currentProblemIndex to 0
-      let doi = ''
-       console.log(filteredQuestions);
-       for (let i = 0; i < filteredQuestions.length; i++) {
-           console.log(`Question ${i + 1}: ${filteredQuestions[i].question}`);
-           doi+=filteredQuestions[i].question
-          //  currentProblemIndex = i;
-          // rightQuestion(`${filteredQuestions[i].question}`)
-       }
-      //  console.log(" currentProblemIndex: "+ doi)
-       currentProblemIndex = 0;
-     
-       // Update the filtered questions to only include matching questions
-       filteredQuestions = filteredQuestions.slice();
-       console.log('filterQuestions: ',filterQuestions)
-       // Load the first question
-       // console.log( "Loaded",loadQuestion())
-       loadQuestion(doi);
-  } else {
-    // console.log("Fried",problemSolutions[5])
-    // If no matching questions are found, display a message or take appropriate action
-    document.getElementById('question').innerHTML = 'No matching questions found.';
-  }
-
-  
-}
-
-
-// -----------------------------------------------------
-function loadQuestion(x) {
-  console.log(x)
-  if(x){
-    alert(x)
-  }
-  let questionElement = document.getElementById('question');
-  let currentProblem = getCurrentProblem();
-  
-  questionElement.innerHTML = currentProblem.question;
-  document.getElementById('equationBuilder').innerHTML = '';
-  currentProblem.currentStep = 1;
-  currentProblem.foundSolutions = [];
-}
-
-
-// filterMe
-document.addEventListener('DOMContentLoaded', function() {
-  // document.getElementById('filterMe').addEventListener('click', filterQuestions);
-
-    loadQuestion();
-    // document.getElementById('.question').addEventListener('click', checkSolution);
-    searchElement();
-// document.querySelector('.question').addEventListener('click', rightQuestion)
-
-    
-    document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
-    document.getElementById('clearSolution').addEventListener('click', clearSolution); // Add this line
-    // deleteQuestion.addEventListener('click', clearSolution); // Add this line
-   
-  });
-  
-  function searchElement() {
-    const input = document.getElementById('searchBox').value.toLowerCase();
-    const results = document.getElementById('searchResults');
-    results.innerHTML = '';
-  
-    // Assume elementTools is an array with a single object from the database
-    // We are interested in the first item of the array, hence elementTools[0]
-    const tools = elementTools[0]; // Getting the actual object with the tool values
-    for (const key in tools) {
-      if (tools.hasOwnProperty(key)) {
-        const value = tools[key];
-        // Ensure that the value is a string and not another object like _id or __v
-        if (typeof value === 'string' && (key.includes(input) || value.includes(input))) {
-          const element = document.createElement('div');
-          element.textContent = value;
-          element.classList.add('draggable');
-          element.setAttribute('draggable', true);
-          element.ondragstart = drag;
-          results.appendChild(element);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            background-color: #007de4;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-      }
-    }
-  }
-  
-
-// When the user clicks the button, open the modal 
-btn.onclick = function() {
-  modal.style.display = "block";
-}
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
-  
-  function playSound(sound) {
-    // console.log(sound)
-    sound.currentTime = 0; // Rewind to the start
-    sound.play();
-  }
-
-  function reloadPage() {
-    location.reload();
-  }
-
-function allowDrop(event) {
-  event.preventDefault();
-}
-
-function drag(event) {
-  event.dataTransfer.setData("text", event.target.textContent);
-  playSound(dragSound); // Play drag sound
-  // alert("I am dragged");
-}
-
-function drop(event) {
-  event.preventDefault();
-  const data = event.dataTransfer.getData("text");
-  const newElement = document.createElement('span');
-  newElement.textContent = data;
-  newElement.classList.add('editable');
-  newElement.setAttribute('contenteditable', true);
-  newElement.ondragstart = drag;
-
-  if (event.target.id === "equationBuilder" && event.target.hasChildNodes()) {
-    event.target.appendChild(document.createTextNode(' '));
-  }
-
-  event.target.appendChild(newElement);
-  playSound(dropSound); // Play drop sound
-}
-
-
-// document.getElementById('toggleButton').addEventListener('click', function() {
-//   var searchContainer = document.querySelector('.search-container');
-//   if (searchContainer.style.display === 'none') {
-//       searchContainer.style.display = 'block';
-//   } else {
-//       searchContainer.style.display = 'none';
-//   }
-// });
-
-
-// Function to check if the user's solution is correct and handle the answer submission
-function checkSolution() {
-  const currentProblem = getCurrentProblem(); // Get the current problem details
-  const stepKey = `step${currentProblem.currentStep}`; // Key for the current step
-
-  // console.log(stepKey);
-  let userSolution = document.getElementById('equationBuilder').textContent.trim(); // Get user's input
-  const correctSolutions = currentProblem.solutions[stepKey]; // Array of correct solutions for the current step
-
-  alert(correctSolutions)
-  const normalizedUserSolution = userSolution.replace(/\s+/g, '').toLowerCase(); // Normalize user's input for comparison
-
-    // console.log('This is solution: '+normalizedUserSolution);
-  // Check if the user's normalized solution is among the correct solutions
-  if (correctSolutions.includes(normalizedUserSolution)) {
-
-    // If the solution is correct and not already found, add it to found solutions
-    
-    if (!currentProblem.foundSolutions.includes(normalizedUserSolution)) {
-      
-      currentProblem.foundSolutions.push(normalizedUserSolution); // Add to found solutions
-      console.log( "Initial solution: "+currentProblem.foundSolutions);
-      
-      correctAnswersCount++; // Increment correct answers count
-      // console.log(`Correct! Total correct answers: ${correctAnswersCount}`);
-      alert(`Correct! You have solved part of step ${currentProblem.currentStep}.`);
-
-      // console.log("currentProblem.foundSolutions.length",currentProblem.foundSolutions.length );
-      // console.log("correctSolutions.length ",correctSolutions.length )
-      // Check if all solutions for the current step have been found
-      if (currentProblem.foundSolutions.length > 0) {
-        alert(`Step ${currentProblem.currentStep} is fully or partially correct!`);
-        moveToNextStep(currentProblem);
-      }
-       else {
-
-        document.getElementById('equationBuilder').innerHTML =" "
-        alert("Correct! Please enter the next part of the solution.");
-      }
-    } else {
-      alert("You have already entered this part of the solution."); // Solution already found
-    }
-  } else {
-    incorrectAnswersCount++; // Increment incorrect answers count
-    console.log(`Incorrect attempt. Total incorrect answers: ${incorrectAnswersCount}`);
-    alert("That's not correct. Try again.");
-  }
-
-  // Clear the equation builder if all parts of the current step are correct
-  if (currentProblem.foundSolutions.length === correctSolutions.length) {
-    document.getElementById('equationBuilder').innerHTML = ''; // Clear equation builder
-  }
-
-  // Submit the answer whether it is correct or not
-  submitAnswer(correctSolutions.includes(normalizedUserSolution));
-}
-
-// Function to move to the next step of the problem
-function moveToNextStep(currentProblem) {
-  if (currentProblem.solutions[`step${currentProblem.currentStep + 1}`]) {
-    currentProblem.currentStep++; // Increment step
-    currentProblem.foundSolutions = []; // Reset found solutions for the next step
-    alert(`Now proceed to step ${currentProblem.currentStep}.`);
-    document.getElementById('equationBuilder').innerHTML =" "
-  } else {
-    alert("You've completed this problem!");
-    nextQuestion(); // Move to the next question
-  }
-}
-
-
-// Optionally, you can create a function to log the total correct answers when the user logs out or leaves the page
-function logOutUser() {
-  console.log(`Total correct answers during this session: ${correctAnswersCount}`);
-  // Proceed with the logout logic...
-}
-  
-  
-
-  
-  
-  function nextQuestion() {
-    // Move to the next problem if there is one
-    currentProblemIndex += 1;
-    if (currentProblemIndex < problemSolutions.length) {
-      loadQuestion();
-    } else {
-      alert("All problems are fully solved!");
-      // Optionally, you can reset to the first problem or disable the next question button
-      currentProblemIndex = 0;
-      loadQuestion();
-    }
-  }
-  
-
-  function clearSolution() {
-    document.getElementById('equationBuilder').innerHTML = '';
-  }
-  
-  function backQuestion() {
-    // Check if there is a previous problem
-    if (currentProblemIndex > 0) {
-      currentProblemIndex -= 1; // Move to the previous problem
-      loadQuestion(); // Load the previous problem
-    } else {
-      // If already at the first problem, perhaps wrap around or disable the button
-      alert("This is the first problem.");
-      // Optionally, disable the back question button
-      // document.getElementById('backQuestion').disabled = true;
-    }
-  }
-  
-
-  function logElement(event) {
-    const elementText = event.target.textContent.trim();
-    console.log(elementText);
-  }
-  
-
-  function populateTools() {
-    const tools = elementTools[0]; // Or however your data structure is formatted
-    const results = document.getElementById('searchResults');
-    results.innerHTML = ''; // Clear existing tools
-  
-    for (const category in tools) {
-      if (tools.hasOwnProperty(category)) {
-        const categoryTools = tools[category];
-        for (const toolName in categoryTools) {
-          if (categoryTools.hasOwnProperty(toolName)) {
-            const toolValue = categoryTools[toolName];
-            // Now create an element for each tool
-            const element = document.createElement('div');
-            element.textContent = toolValue;
-            element.classList.add('draggable');
-            element.setAttribute('draggable', true);
-            element.ondragstart = drag;
-            // Attach the logElement function to click and mouseover events
-            element.addEventListener('click', logElement);
-            // element.addEventListener('mouseover', logElement);
-            results.appendChild(element);
-          }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            color: black;
+            text-align: center;
         }
-      }
-    }
-  }
-  
-  window.addEventListener('beforeunload', logOutUser);
-  // Call populateTools() to populate the tool area when the page loads or the data is fetched
-  
-  populateTools()
-  // function rightQuestion(x){
-  //   alert(1)
-  //   console.log("rightQuestion",x);
-  //   document.querySelector(".question").innerHTML=x;
-  
-  // }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            margin-top: 20px;
+            color: #555;
+        }
+        p, ul {
+            text-align: left;
+            line-height: 1.6;
+        }
+        .button {
+            display: block;
+            width: calc(100% - 40px); /* Account for padding */
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 22px;
+            transition: background 0.3s ease;
+        }
+        .button:hover {
+            background-color: #003d7a;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .logout-button {
+            background-color: #f44336;
+        }
+        .logout-button:hover {
+            background-color: #c23025;
+        }
+        .chatbot-access {
+            background-color: #4CAF50;
+        }
+        .chatbot-access:hover {
+            background-color: #388E3C;
+        }
+    </style>
+</head>
+
+    <body>
+        <div class="container">
+            <div class="container">
+                <h1>Welcome, <%= user.username %>!</h1>
+                
+                <h2>Your Answers:</h2>
+                <ul>
+                    <% userAnswers.forEach(function(answer) { %>
+                        <li><%= answer.selectedAnswer %></li>
+                    <% }); %>
+                </ul>
+        
+                <h2>Your Score: <%= score %></h2>
+            <a href="/chatbot" class="button chatbot-access">Test Math Chatbot</a>
+            <a href="/" class="button">Home</a>
+            <a href="/logout" class="button logout-button">Logout</a>
+        </div>
+    </body>
+    </html>

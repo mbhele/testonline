@@ -2,68 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kid's Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff; /* Soft blue background */
-            padding: 20px;
+            background-color: #007de4;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            color: black;
+            text-align: center;
+        }
         h1 {
             color: #333;
-            text-align: center;
-            margin-bottom: 20px;
         }
-
-        p {
-            background-color: #ffffff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        a {
-            display: inline-block;
-            background-color: #ff4757;
-            color: #ffffff;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+        h2 {
             margin-top: 20px;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
-            transition: background-color 0.3s;
+            color: #555;
         }
-
-        a:hover {
-            background-color: #ff6b81;
+        p, ul {
+            text-align: left;
+            line-height: 1.6;
         }
-
-        .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .button {
+            display: block;
+            width: calc(100% - 40px); /* Account for padding */
+            margin: 10px auto;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 22px;
+            transition: background 0.3s ease;
+        }
+        .button:hover {
+            background-color: #003d7a;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .logout-button {
+            background-color: #f44336;
+        }
+        .logout-button:hover {
+            background-color: #c23025;
+        }
+        .chatbot-access {
+            background-color: #4CAF50;
+        }
+        .chatbot-access:hover {
+            background-color: #388E3C;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Welcome to Your Profile, <%= kid.name %>!</h1>
-        <p>You've scored yourself <strong><%= kid.points %></strong> points!</p>
-        <p>Age: <%= kid.age %></p>
-        <p>Would you like to continue training and earn more rewards?</p>
-        <a href="http://localhost:9000/chatbot" style="background-color:green;">Train for more Rewards</a>
-        <!-- Display more information as needed -->
-        <a href="/logout">Logout</a>
-    </div>
-</body>
-</html>
+
+    <body>
+        <div class="container">
+            <h1>Welcome, <%= user.username %>!</h1>
+            
+            <h2>Your Answers:</h2>
+            <ul>
+                <% userAnswers.forEach(function(answer) { %>
+                    <li><%= answer.selectedAnswer %></li>
+                <% }); %>
+            </ul>
+    
+            <h2>Your Score: <%= score %></h2>
+    
+            <a href="/chatbot" class="button chatbot-access">Test Math Chatbot</a>
+            <a href="/" class="button">Home</a>
+            <a href="/logout" class="button logout-button">Logout</a>
+        </div>
+    </body>
+    </html>

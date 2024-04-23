@@ -22,8 +22,12 @@
                 <a href="/blogs" title="Read our blogs"><i class="fa fa-info-circle" aria-hidden="true"></i><br>Read (blogs)</a>
             </div>
             <div class="navbar-buttons">
-                <a href="/login" class="button login">Login</a>
-                <a href="/register" class="button register">Create an account <i class="fa fa-sign-in" aria-hidden="true"></i></a>
+                <% if (user) { %>
+                    <a href="/logout" class="button logout">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="button login">Login</a>
+                    <a href="/register" class="button register">Create an account <i class="fa fa-sign-in" aria-hidden="true"></i></a>
+                <% } %>
             </div>
             <div class="icon" onclick="toggleMenu()">&#9776;</div>
         </div>

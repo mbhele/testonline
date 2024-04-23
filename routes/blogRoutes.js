@@ -37,10 +37,11 @@ const upload = multer({
 
 
 // Show all blog posts
+// Inside your route handler for rendering the index page
 router.get('/', async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: 'desc' }).lean();
-    res.render('blogs/index', { blogs });
+    res.render('blogs/index', { blogs, isAdmin: req.isAuthenticated() && req.user.role === 'admin' });
   } catch (error) {
     console.error('Error fetching blogs:', error);
     res.redirect('/');
@@ -98,17 +99,20 @@ router.post('/',upload.single('image'), async (req, res) => {
 
 
 // Show a single blog post
+// Assuming you render the show.ejs template in a route handler
 router.get('/:id', async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id).lean();
-    if (!blog) return res.redirect('/blogs');
-    const readingTime = calculateReadingTime(blog.content); // Call a function to calculate
-    res.render('blogs/show', { blog, readingTime });
+      const blog = await Blog.findById(req.params.id).lean();
+      if (!blog) return res.redirect('/blogs');
+      const readingTime = calculateReadingTime(blog.content); // Call a function to calculate
+      const isAdmin = req.user && req.user.role === 'admin'; // Check if user is admin
+      res.render('blogs/show', { blog, readingTime, isAdmin }); // Pass isAdmin to the template
   } catch (error) {
-    console.error('Error finding blog:', error);
-    res.redirect('/blogs');
+      console.error('Error finding blog:', error);
+      res.redirect('/blogs');
   }
 });
+
 
 // Define the calculateReadingTime function in the same file or import it if it's defined elsewhere
 function calculateReadingTime(content) {

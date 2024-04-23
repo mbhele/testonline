@@ -1,4 +1,3 @@
-// models/Kid.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
@@ -18,13 +17,16 @@ const kidSchema = new Schema({
     date: Date,
     activity: String,
     score: Number
-  }]
+  }],
+  role: { type: String, default: 'kid' }  // Adding a role field
 });
 
+// Asynchronously hash the password when setting it
 kidSchema.methods.setPassword = async function(password) {
   this.passwordHash = await bcrypt.hash(password, 10);
 };
 
+// Compare the provided password with the stored hash
 kidSchema.methods.validatePassword = function(password) {
   return bcrypt.compare(password, this.passwordHash);
 };

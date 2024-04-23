@@ -207,50 +207,49 @@ body, html {
     </style>
 </head>
 <body>
-  <div class="container">
-    <h1><%= blog.title %></h1>
-    <p class="author">Author: <%= blog.author %>, <%= new Date(blog.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %> · <%= readingTime %> min read</p>
-    <div class="social-icons">
-      <div class="icon-container">
-        <span class="icon heart" onclick="incrementCount('heartCount')">&#10084;</span>
-        <span id="heartCount">0</span>
-    </div>
-    <div class="icon-container">
-        <span class="icon clap" onclick="incrementCount('clapCount')">&#128079;</span>
-        <span id="clapCount">0</span>
-    </div>
-    <div class="share-button">Share
-        <div class="share-links">
-            <a href="#" class="share-link">LinkedIn</a>
-            <a href="#" class="share-link">Facebook</a>
-            <a href="#" class="share-link">TikTok</a>
-            <!-- Add more links here -->
+    <div class="container">
+        <h1><%= blog.title %></h1>
+        <p class="author">Author: <%= blog.author %>, <%= new Date(blog.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) %> · <%= readingTime %> min read</p>
+        <div class="social-icons">
+            <div class="icon-container">
+                <span class="icon heart" onclick="incrementCount('heartCount')">&#10084;</span>
+                <span id="heartCount">0</span>
+            </div>
+            <div class="icon-container">
+                <span class="icon clap" onclick="incrementCount('clapCount')">&#128079;</span>
+                <span id="clapCount">0</span>
+            </div>
+            <div class="share-button">Share
+                <div class="share-links">
+                    <a href="#" class="share-link">LinkedIn</a>
+                    <a href="#" class="share-link">Facebook</a>
+                    <a href="#" class="share-link">TikTok</a>
+                    <!-- Add more links here -->
+                </div>
+            </div>
+        </div>
+        <% if (blog.image) { %>
+            <img src="<%= blog.image.url %>" alt="<%= blog.title %> Image" style="max-width:100%; height:auto;">
+        <% } %>
+      
+        <div class="content blog-content">
+            <%- blog.content %>
+        </div>
+    
+        <% if (isAdmin) { %>
+            <!-- Interaction Icons and Edit/Delete buttons -->
+            <div class="edit-delete-buttons">
+                <a href="/blogs/<%= blog._id %>/edit">Edit</a>
+                <form action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        <% } %>
+    
+        <div class="back-to-list">
+            <a href="/blogs">Back to All Posts</a>
         </div>
     </div>
-    </div>
-    <% if (blog.image) { %>
-        <img src="<%= blog.image.url %>" alt="<%= blog.title %> Image" style="max-width:100%; height:auto;">
-    <% } %>
-  
-<!-- show.ejs -->
-<div class="content blog-content">
-  <%- blog.content %>
-</div>
-
-    <!-- Interaction Icons and Edit/Delete buttons -->
- 
-
-    <div class="edit-delete-buttons">
-        <a href="/blogs/<%= blog._id %>/edit">Edit</a>
-        <form action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
-            <button type="submit">Delete</button>
-        </form>
-    </div>
-
-    <div class="back-to-list">
-        <a href="/blogs">Back to All Posts</a>
-    </div>
-</div>
 
     <script>
  function incrementCount(id) {
