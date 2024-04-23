@@ -13,21 +13,18 @@ require('dotenv').config();
 
 // Model imports
 const User = require('./models/user');
-const Kid = require('./models/Kid'); // Assuming Kid model is correctly set up like User
 
 // Route imports
 const userRoutes = require('./routes/users');
-// const trainRoutes = require('./routes/train');
 const chatbotRoutes = require('./routes/chatbot');
 const aboutRoutes = require('./routes/about');
 const blogRoutes = require('./routes/blogRoutes');
-
-// const childRoutes = require('./routes/kidRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const fileUploadRouter = require('./routes/fileUpload');
 
 const app = express();
 
+// Passport Config - assuming passportConfig is correctly set up
 // Passport Config - assuming passportConfig is correctly set up
 require('./config/passportKid')(passport); // Adjust the path as necessary
 
@@ -70,11 +67,7 @@ passport.use(new LocalStrategy({
     passwordField: 'password'  // ensure your form has a password field
   }, async (username, password, done) => {
     try {
-      let user = await User.findOne({ username });
-      if (!user) {
-        user = await Kid.findOne({ username });
-      }
-
+      const user = await User.findOne({ username });
       if (!user) {
         return done(null, false, { message: 'User not found' });
       }
@@ -92,13 +85,12 @@ passport.use(new LocalStrategy({
 
 // Serialization and Deserialization
 passport.serializeUser((user, done) => {
-  done(null, { id: user.id, type: user instanceof Kid ? 'Kid' : 'User' });
+  done(null, user.id);
 });
 
-passport.deserializeUser(async (userKey, done) => {
-  const Model = userKey.type === 'Kid' ? Kid : User;
+passport.deserializeUser(async (id, done) => {
   try {
-    const user = await Model.findById(userKey.id);
+    const user = await User.findById(id);
     done(null, user);
   } catch (error) {
     done(error, null);
@@ -109,9 +101,7 @@ passport.deserializeUser(async (userKey, done) => {
 app.use('/', userRoutes);
 app.use('/about', aboutRoutes);
 app.use('/chatbot', chatbotRoutes);
-
 app.use('/blogs', blogRoutes);
-
 app.use('/admin', adminRoutes);
 app.use('/upload', fileUploadRouter);
 
@@ -120,15 +110,11 @@ app.get('/', (req, res) => {
   res.render('home', { user: req.user || null });
 });
 
-
-
 // Error handling
-// After all specific routes
 app.use((req, res, next) => {
   res.locals.user = req.user || null; // This makes user available as a local variable in all views
   next();
 });
-
 
 const server = http.createServer(app);
 const io = require('socket.io')(server);
